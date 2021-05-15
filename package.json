@@ -1,0 +1,30 @@
+{
+  "name": "community-discord-bot",
+  "version": "1.0.0",
+  "description": "Community Discord Bot that allows people to bond in communities :D",
+  "main": "src/bot.js",
+  "scripts": {
+    "start": "node .",
+    "bot": "nodemon ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nimit2801/Community-Discord-Bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nimit2801/Community-Discord-Bot/issues"
+  },
+  "homepage": "https://github.com/nimit2801/Community-Discord-Bot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "dotenv": "^9.0.2",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.26.0",
+    "nodemon": "^2.0.7"
+  }
+}

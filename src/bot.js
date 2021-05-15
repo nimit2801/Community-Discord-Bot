@@ -4,6 +4,9 @@ const client = new Discord.Client();
 
 // To do
 // 1. Make Channels
+//  a. Make Channels done
+//  b. Add two people in a channel
+//  c. Make a role for them and send them messages
 // 2. Suggest topics for the user
 // 3. Delete them after a interval
 
@@ -49,6 +52,37 @@ const random = async (max = 50) => {
   return random_;
 };
 
+// Make channels
+const makeChannels = async (message) => {
+  let catChannel = await message.guild.channels.create(`Comm Talks`, {
+    type: 'category',
+    reason: 'To chat with community members',
+  });
+  log('Category channel created');
+  // log(catChannel);
+  let channel = [];
+  for (let i = 0; i < 5; i++) {
+    channel[i] = await message.guild.channels.create(`Comm Talks ${i + 1}`, {
+      topic:
+        'This channel helps random people from the community to network :D',
+      parent: catChannel,
+      reason: 'To chat with community members',
+    });
+    log('channel create' + (i + 1));
+  }
+  // log(channel);
+  setTimeout(async function fun() {
+    for (let i = 0; i < 5; i++) {
+      channel[i].delete();
+      log(`channel ${i + 1} deleted!`);
+    }
+    log('All Text Channels Deleted!');
+  }, 5000);
+  setTimeout(async function fun() {
+    await catChannel.delete('some reason :D');
+    log('Category Channel Deleted!');
+  }, 10000);
+};
 // Listener that listens to messages :D
 client.on('message', async (message) => {
   if (message.author.bot) return;
@@ -62,6 +96,19 @@ client.on('message', async (message) => {
             log(userId.length);
             let random_ = await random(userId.length);
             log(random_);
+            if (message.guild) message.channel.send('working :D');
+            else {
+              message.channel.send('Please use this command in a server!');
+            }
+          } catch (error) {
+            log(error);
+          }
+        }
+        break;
+      case `${PREFIX}make`:
+        {
+          try {
+            makeChannels(message);
             if (message.guild) message.channel.send('working :D');
             else {
               message.channel.send('Please use this command in a server!');

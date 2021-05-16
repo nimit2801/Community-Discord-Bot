@@ -1,13 +1,33 @@
-// let ran = [1, 6, 2, 3, 5, 7, 9];
-let random_ = [];
-let number;
-let max = 11;
-let arrL = 10 >= max ? (max % 2 == 0 ? max - 2 : max - 1) : 10;
-console.log(arrL);
-for (let i = 0; random_.length != arrL; i++) {
-  number = Math.floor(Math.random() * (max - 1));
-  if (!random_.includes(number)) random_.push(number);
-}
-console.log(random_);
-random_.sort();
-console.log(random_);
+require('dotenv').config();
+const Discord = require('discord.js');
+const client = new Discord.Client();
+
+let PREFIX = '$';
+
+client.once('ready', () => {
+  console.log('The bot is ready lets go!');
+});
+
+client.on('message', async (message) => {
+  if (message.content.startsWith(`${PREFIX}`)) {
+    let roles = message.guild.roles.cache;
+    let channels = message.guild.channels.cache;
+    let [command, args] = message.content.split(' ');
+    if (message.content.startsWith(`${PREFIX}deler`)) {
+      roles.forEach(async (role) => {
+        if (role.name.startsWith('comms')) await role.delete();
+        console.log(role.name);
+      });
+      message.channel.send(`All Roles stasrting with ${args} were deleted!`);
+    }
+    if (message.content.startsWith(`${PREFIX}delec`)) {
+      console.log(args);
+      channels.forEach(async (channel) => {
+        // await channel.delete();
+        if (channel.name.startsWith('comms')) console.log(channel.name);
+      });
+    }
+  }
+});
+
+client.login(process.env.BOT_TOKEN_);

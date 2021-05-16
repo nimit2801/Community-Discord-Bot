@@ -22,24 +22,24 @@ function log(args) {
 }
 
 async function noOfGuildMembersOnlineIdle(message) {
-  let userId = [];
+  let users = [];
   await message.guild.members.cache.map((user) => {
     if (
       user.user.bot === false &&
       (user.presence.status == 'online' || user.presence.status == 'idle')
     ) {
-      userId.push(user.id);
+      users.push(user);
     }
   });
-  return userId.length;
+  return users;
 }
 // To get user ID of the members online in the guild where the command was used :D
 async function getUserID(message, roles, random_) {
-  let userId = [];
   let i = 0;
   let m = 1;
   let j = 0;
   log(random_);
+  let users = [];
   await message.guild.members.cache.map((user) => {
     // || user.presence.status === 'online' || user.presence.status === 'idle'
     if (
@@ -47,36 +47,34 @@ async function getUserID(message, roles, random_) {
       (user.presence.status == 'online' || user.presence.status == 'idle')
     ) {
       if (random_.includes(i)) {
-        // user.roles.add(roles[j]);
+        log(j);
+        user.roles.add(roles[j]);
+        log(`${roles[j]} added to ${user.name}`);
+        users.push(user);
         if (m % 2 == 0) {
           j++;
         }
         m = m + 1;
-        log(j);
       }
-      log(
-        `${user.id}: ${user.user.username} ${user.user.discriminator} ${user.presence.status}`
-      );
-      userId.push(user.id);
+      i = i + 1;
     }
-    i = i + 1;
   });
-  return userId;
+  return users;
 }
 
 // Random Number generator: Generates 10 random numbers between 0 and max
 const random = async (message) => {
-  let max = (await noOfGuildMembersOnlineIdle(message)) || 50;
+  let max = (await noOfGuildMembersOnlineIdle(message)) || 10;
+  max = max.length;
   log(max);
   let random_ = [];
   let number;
-  let arrL = 10 >= max ? (max % 2 == 0 ? max - 2 : max - 1) : 10;
+  let arrL = max >= 10 ? 10 : max % 2 == 0 ? max : max - 1;
   console.log(arrL);
   for (let i = 0; random_.length != arrL; i++) {
     number = Math.floor(Math.random() * (max - 1));
     if (!random_.includes(number)) random_.push(number);
   }
-  console.log(random_);
   random_.sort();
   console.log(random_);
   return random_;
@@ -125,19 +123,20 @@ const makeChannels = async (message) => {
 // create 5 roles for the different channels
 const createRoles = async (message) => {
   let roles = [];
+  let noUser = noOfGuildMembersOnlineIdle(message);
   let colors = ['GREEN', 'BLUE', 'PURPLE', 'ORANGE', 'GOLD'];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < noUser / 2; i++) {
     roles[i] = await message.guild.roles.create({
       data: { name: `comms ${i + 1}`, color: `${colors[i]}` },
     });
   }
   log('roles created');
-  // setTimeout(function fun() {
-  //   roles.forEach((role) => {
-  //     role.delete();
-  //   });
-  //   log('deleted all roles');
-  // }, 20000);
+  setTimeout(function fun() {
+    roles.forEach((role) => {
+      role.delete();
+    });
+    log('deleted all roles');
+  }, 20000);
   return roles;
 };
 
@@ -153,8 +152,8 @@ client.on('message', async (message) => {
             let roles = await createRoles(message);
             log(roles);
             let random_ = await random(message);
-            let userId = await getUserID(message, roles, random_);
-            log(userId.length);
+            let users = await getUserID(message, roles, random_);
+            log(`No of users assigned the role: ${users.length}`);
             if (message.guild) message.channel.send('working :D');
             else {
               message.channel.send('Please use this command in a server!');
@@ -180,11 +179,17 @@ client.on('message', async (message) => {
       case `${PREFIX}role`:
         {
           try {
-            createRoles(message);
+            let roles = await createRoles(message);
             if (message.guild) message.channel.send('working :D');
             else {
               message.channel.send('Please use this command in a server!');
             }
+            setTimeout(function fun() {
+              roles.forEach(async (role) => {
+                await role.delete();
+              });
+              log('deleted all roles');
+            }, 10000);
           } catch (error) {
             log(error);
           }
@@ -195,6 +200,20 @@ client.on('message', async (message) => {
           try {
             let random_ = await random(message);
             log(random_);
+            if (message.guild) message.channel.send('working :D');
+            else {
+              message.channel.send('Please use this command in a server!');
+            }
+          } catch (error) {
+            log(error);
+          }
+        }
+        break;
+      case `${PREFIX}user_`:
+        {
+          try {
+            let userNo = await noOfGuildMembersOnlineIdle(message.channel);
+            log(userNo.length);
             if (message.guild) message.channel.send('working :D');
             else {
               message.channel.send('Please use this command in a server!');
